@@ -10,10 +10,13 @@ public class CameraManager : MonoBehaviour
     public Camera UICam;
     [Header("Component References")]
     CinemachineComponentBase componentBase;
-    public GameObject VCamOrbit;
+    public GameObject[] OrbitCameras = new GameObject[4];
     public GameObject LookAtObject;
+    public CameraController cameraController;
 
-    public UIScript uiScript;
+    bool IsGamePaused = false;
+    float XAxisMaxSpeed;
+    float YAxisMaxSpeed;
     Vector3 GetCenter(GameObject o) {
         Vector3 sumVector = new Vector3(0f,0f,0f);
         var children = GetComponentsInChildren<Transform>();
@@ -28,23 +31,43 @@ public class CameraManager : MonoBehaviour
         return groupCenter;
     }
     private void Start() {
-        Debug.Log(LookAtObject.transform.childCount);
-        //var c = LookAtObject.GetComponentsInChildren<Transform>();
-        //foreach(var child in c) {
-        //    Debug.Log(child.position);
-        //}
         Vector3 position = GetCenter(LookAtObject);
-        //Debug.Log(position);
         GameObject wCenter = new GameObject();
         wCenter.transform.position = position;
-        VCamOrbit.GetComponent<CinemachineFreeLook>().m_Follow = wCenter.transform;
-        VCamOrbit.GetComponent<CinemachineFreeLook>().m_LookAt = wCenter.transform;
+        foreach(var Camera in OrbitCameras) {
+            Camera.GetComponent<CinemachineFreeLook>().m_Follow = wCenter.transform;
+            Camera.GetComponent<CinemachineFreeLook>().m_LookAt = wCenter.transform;
+            XAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed;
+            YAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed;
+            Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed = 0f;
+        }
     }
 
-    public void Swap() {
-        uiScript.DebugLog();
-        Time.timeScale = 0f;
+    public void PauseMove() {
+        IsGamePaused = !IsGamePaused;
+        if(IsGamePaused) {
+            foreach(var Camera in OrbitCameras) {
+                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
+            }
+        } else {
+            //VCamOrbit.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed = XAxisMaxSpeed;
+            foreach(var Camera in OrbitCameras) {
+                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = YAxisMaxSpeed;
+            }
+        }
         //GameCam.gameObject.SetActive(!GameCam.gameObject.activeSelf);
-        UICam.gameObject.SetActive(!UICam.gameObject.activeSelf);
+        //UICam.gameObject.SetActive(!UICam.gameObject.activeSelf);
+    }
+    public void RotateCameraLeft() {
+        StartCoroutine(ResetCameraAxis());
+        cameraController.SwitchCamera(-1);
+    }
+    public void RotateCameraRight() {
+        StartCoroutine(ResetCameraAxis());
+        cameraController.SwitchCamera(1);
+    }
+    IEnumerator ResetCameraAxis() {
+        yield return new WaitForFixedUpdate();
+        cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.VirtualCameraGameObject.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.5f;
     }
 }

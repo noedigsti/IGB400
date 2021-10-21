@@ -19,6 +19,5 @@ public class UIScript : MonoBehaviour
     public void DebugLog() {
         Debug.Log($"Clicked {n}");
         n += 1;
-        Time.timeScale = 1f;
     }
 }

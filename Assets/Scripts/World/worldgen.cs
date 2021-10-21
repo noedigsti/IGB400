@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 public class worldgen : MonoBehaviour
 {
+    public bool GenerateWorld = true;
     public GameObject corner;
     public GameObject side;
     public GameObject inner;
@@ -11,7 +12,6 @@ public class worldgen : MonoBehaviour
     public float offset = 1f;
     public Vector3 gridOrigin = Vector3.zero;
     World world;
-    public bool IsGenerated = false;
 
     [Serializable]
     public class World
@@ -67,15 +67,16 @@ public class worldgen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        world = new World(gridX);
-        for(int x = 0;x < gridX;x++) {
-            for(int z = 0;z < gridX;z++) {
-                Vector3 pos = new Vector3(x * offset,0,z * offset) + gridOrigin;
-                world.Rows[x].Columns[z].position = pos;
+        if(GenerateWorld) {
+            world = new World(gridX);
+            for(int x = 0;x < gridX;x++) {
+                for(int z = 0;z < gridX;z++) {
+                    Vector3 pos = new Vector3(x * offset,0,z * offset) + gridOrigin;
+                    world.Rows[x].Columns[z].position = pos;
+                }
             }
+            Spawn();
         }
-        Spawn();
-        IsGenerated = true;
         //world.array[0,5].transform.position += new Vector3(0,1,0);
     }
     void Spawn() {

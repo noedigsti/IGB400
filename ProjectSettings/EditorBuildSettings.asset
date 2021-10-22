@@ -13,3 +13,5 @@ EditorBuildSettings:
       guid: cd12f71ae59800e4d9792d83c0caa2f6, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000,
       guid: 94f624986e328b54197b1b3213e31801, type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 7ff8324f91033fb4586860aac3a591b6,
+      type: 2}

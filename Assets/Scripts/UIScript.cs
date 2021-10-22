@@ -6,6 +6,7 @@ public class UIScript : MonoBehaviour
 {
     int n = 0;
     public TMPro.TMP_Text text;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,8 +17,7 @@ public class UIScript : MonoBehaviour
         text.text = n.ToString();
     }
 
-    public void DebugLog() {
-        Debug.Log($"Clicked {n}");
-        n += 1;
+    public void MoveOption() {
+        GameManager.Instance.ToggleMove(!GameManager.Instance.IsPaused);
     }
 }

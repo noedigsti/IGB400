@@ -2,17 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
+    bool isPaused;
+    public bool IsPaused => isPaused;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        isPaused = true;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    public bool ToggleMove(bool b) {
+        return isPaused = b;
     }
 }

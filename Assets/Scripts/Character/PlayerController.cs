@@ -19,9 +19,11 @@ public class PlayerController : MonoBehaviour
                 //Camera main raycast
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out hit)) {
-                    Transform objHit = hit.transform;
+                    if (hit.collider.isTrigger) {
+                        Debug.Log(hit.transform.position);
+                        gameObject.transform.position = hit.transform.gameObject.transform.position;
 
-                    gameObject.transform.position = objHit.position;
+                    }
                 }
             }
         }

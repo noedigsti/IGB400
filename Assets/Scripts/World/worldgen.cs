@@ -2,90 +2,98 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Random = UnityEngine.Random;
 public class worldgen : MonoBehaviour
 {
-    public bool GenerateWorld = true;
-    public GameObject corner;
-    public GameObject side;
-    public GameObject inner;
-    public int gridX = 8; // Assume N x N generation
-    public float offset = 1f;
-    public Vector3 gridOrigin = Vector3.zero;
-    World world;
+    public bool Generate = true;
+    //public GameObject tileToSpawn;
+    //public GameObject dummyCube;
+    //public GameObject treasure;
+    //public Vector3 playerSpawnPoint;
+    public bool randomWorld = false;
+    [Range(0,100)]
+    public int randomFillPercent;
+    public int[,] map;
+    public string seed;
+    public int width;
+    public int length;
+    public int tileCount;
+    void GenerateMap() {
+        map = new int[width,length];
+        RandomFillMap();
 
-    [Serializable]
-    public class World
-    {
-        public List<Row> Rows;
-        public GameObject[,] array;
-        public World(int capacity) {
-            TileCount = 0;
-            //Debug.Log($"Generating world ROW with size of {capacity}");
-            Rows = new List<Row>(capacity);
-            for(int z = 0;z < capacity;z++) {
-                //Debug.Log($"ROW ({z}) of {capacity}");
-                //row[z] = new Column(capacity);
-                Rows.Add(new Row(capacity));
+        for(int i = 0;i < 5;i++) {
+            SmoothMap();
+        }
+    }
+    void RandomFillMap() {
+        if(randomWorld) {
+            seed = Time.time.ToString();
+        }
+
+        System.Random pseudoRandom = new System.Random(seed.GetHashCode());
+
+        for(int x = 0;x < width;x++) {
+            for(int y = 0;y < length;y++) {
+                if(x == 0 || x == width - 1 || y == 0 || y == length - 1) {
+                    map[x,y] = 1;
+                } else {
+                    map[x,y] = (pseudoRandom.Next(0,100) < randomFillPercent) ? 1 : 0;
+                }
             }
-            array = new GameObject[capacity,capacity];
-            //Debug.Log($"Size of ROW = {row.Count}");
         }
-    }
-    [Serializable]
-    public class Row
-    {
-        public static int index = 0;
-        public string _name = "Row";
-        public List<Tile> Columns;
-        public Row(int capacity) {
-            _name += $" {index++}";
-            //Debug.Log($"Generating world COLUMN {index} with size of {capacity}");
-            Columns = new List<Tile>(capacity);
-            for(int i = 0;i < capacity;i++) {
-                Columns.Add(new Tile());
-                //col[i] = Vector3.one;
-            }
-            //Debug.Log($"Size of COLUMN = {col.Count}");
-        }
-    }
-    [Serializable]
-    public class Tile
-    {
-        public static int index;
-        public string _name = "Tile";
-        public Vector3 position;
-        public Tile() {
-            _name += $" {index++}";
-            position = Vector3.zero;
-        }
-    }
-    public static int TileCount = 0;
-    public static void AddToCount() {
-        TileCount += 1;
-        //Debug.Log(count);
     }
     // Start is called before the first frame update
     void Start()
     {
-        if(GenerateWorld) {
-            world = new World(gridX);
-            for(int x = 0;x < gridX;x++) {
-                for(int z = 0;z < gridX;z++) {
-                    Vector3 pos = new Vector3(x * offset,0,z * offset) + gridOrigin;
-                    world.Rows[x].Columns[z].position = pos;
+        if(Generate) {
+            GenerateMap();
+        }
+    }
+    void SmoothMap() {
+        for(int x = 0;x < width;x++) {
+            for(int y = 0;y < length;y++) {
+                int neighbourWallTiles = GetSurroundingWallCount(x,y);
+
+                if(neighbourWallTiles > 4)
+                    map[x,y] = 1;
+                else if(neighbourWallTiles < 4)
+                    map[x,y] = 0;
+
+            }
+        }
+    }
+    int GetSurroundingWallCount(int gridX,int gridY) {
+        int wallCount = 0;
+        for(int neighbourX = gridX - 1;neighbourX <= gridX + 1;neighbourX++) {
+            for(int neighbourY = gridY - 1;neighbourY <= gridY + 1;neighbourY++) {
+                if(neighbourX >= 0 && neighbourX < width && neighbourY >= 0 && neighbourY < length) {
+                    if(neighbourX != gridX || neighbourY != gridY) {
+                        wallCount += map[neighbourX,neighbourY];
+                    }
+                } else {
+                    wallCount++;
                 }
             }
-            Spawn();
         }
-        //world.array[0,5].transform.position += new Vector3(0,1,0);
+
+        return wallCount;
     }
-    void Spawn() {
-        for(int x = 0;x < gridX;x++) {
-            for(int z = 0;z < gridX;z++) {
-                GameObject clone = Instantiate(inner,world.Rows[x].Columns[z].position,Quaternion.identity,transform);
-                world.array[x,z] = clone;
-                //clone.GetComponent<Mesh>().RecalculateBounds();
+
+    void OnDrawGizmos() {
+        if(map != null) {
+            for(int x = 0;x < width;x++) {
+                for(int y = 0;y < length;y++) {
+                    Gizmos.color = (map[x,y] == 1) ? Color.black : Color.white;
+                    Vector3 pos = new Vector3(-width / 2 + x + .5f,0,-length / 2 + y + .5f);
+                    Gizmos.DrawCube(pos,Vector3.one);
+                }
             }
+        }
+    }
+    private void Update() {
+        if(Input.GetKeyDown(KeyCode.Q)) {
+            GenerateMap();
         }
     }
 }

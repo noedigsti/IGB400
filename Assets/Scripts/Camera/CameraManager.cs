@@ -17,29 +17,18 @@ public class CameraManager : MonoBehaviour
     bool IsGamePaused = false;
     float XAxisMaxSpeed;
     float YAxisMaxSpeed;
-    Vector3 GetCenter(GameObject o) {
-        Vector3 sumVector = new Vector3(0f,0f,0f);
-        var children = GetComponentsInChildren<Transform>();
-        //Bounds bounds = children[0].bounds;
-        foreach(Transform child in o.transform) {
-            //Debug.Log(child.position);
-            sumVector += child.position;
-            //bounds.Encapsulate(child.bounds);
-        }
-
-        Vector3 groupCenter = sumVector/o.transform.childCount;
-        return groupCenter;
-    }
     private void Start() {
-        Vector3 position = GetCenter(LookAtObject);
-        GameObject wCenter = new GameObject();
-        wCenter.transform.position = position;
-        foreach(var Camera in OrbitCameras) {
-            Camera.GetComponent<CinemachineFreeLook>().m_Follow = wCenter.transform;
-            Camera.GetComponent<CinemachineFreeLook>().m_LookAt = wCenter.transform;
-            XAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed;
-            YAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed;
-            Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed = 0f;
+        if(LookAtObject != null) {
+            GameObject wCenter = new GameObject();
+            wCenter.transform.position = LookAtObject.transform.position;
+            foreach(var Camera in OrbitCameras) {
+                Camera.GetComponent<CinemachineFreeLook>().m_Follow = wCenter.transform;
+                Camera.GetComponent<CinemachineFreeLook>().m_LookAt = wCenter.transform;
+                XAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed;
+                YAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed;
+                Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed = 0f;
+                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
+            }
         }
     }
 
@@ -50,13 +39,10 @@ public class CameraManager : MonoBehaviour
                 Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
             }
         } else {
-            //VCamOrbit.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed = XAxisMaxSpeed;
             foreach(var Camera in OrbitCameras) {
-                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = YAxisMaxSpeed;
+                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
             }
         }
-        //GameCam.gameObject.SetActive(!GameCam.gameObject.activeSelf);
-        //UICam.gameObject.SetActive(!UICam.gameObject.activeSelf);
     }
     public void RotateCameraLeft() {
         StartCoroutine(ResetCameraAxis());

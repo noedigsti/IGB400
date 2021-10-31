@@ -47,4 +47,32 @@ public class UIMenuBehaviour : MonoBehaviour
     public void PlayerAttack() {
         playerController.OnAttack();
     }
+    public void PlayerDefend() {
+        playerController.OnDefend();
+    }
+    public void PlayerNotDefend() {
+        playerController.OnNotDefend();
+    }
+    bool MovingCharacterLeft = false;
+    public void PlayerMoveLeft() {
+        MovingCharacterLeft = true;
+    }
+    bool MovingCharacterRight = false;
+    public void PlayerMoveRight() {
+        MovingCharacterRight = true;
+    }
+    public void PlayerStopMove() {
+        MovingCharacterRight = false;
+        MovingCharacterLeft = false;
+        playerController.CharacterStop();
+    }
+    private void LateUpdate() {
+        if(MovingCharacterLeft) {
+            playerController.OnMoveLeft();
+        }
+        if(MovingCharacterRight) {
+            playerController.OnMoveRight();
+
+        }
+    }
 }

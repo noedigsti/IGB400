@@ -29,7 +29,9 @@ public class PlayerController : MonoBehaviour
     [Header("_Animator Section")]
     public Animator animator;
     int playerMovementAnimationID;
+    int playerJumpAnimationID;
     int playerAttackAnimationID;
+    int playerDefendAnimationID;
 
     private void Start() {
         jumpCounter = maxJumpCounters;
@@ -45,14 +47,23 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         playerMovementAnimationID =  Animator.StringToHash("Moving");
         playerAttackAnimationID =  Animator.StringToHash("Attacking");
+        playerDefendAnimationID =  Animator.StringToHash("Defending");
+        playerJumpAnimationID =  Animator.StringToHash("Jumping");
     }
     public InputActionAsset GetInputActionAsset() {
         return playerInput.actions;
     }
     public void OnAttack() {
-        // Attack
-        Debug.Log("Attack");
+        CharacterStop();
         animator.SetTrigger(playerAttackAnimationID);
+    }
+    public void OnDefend() {
+        CharacterStop();
+        animator.SetBool(playerDefendAnimationID, true);
+        animator.Play("Defend");
+    }
+    public void OnNotDefend() {
+        animator.SetBool(playerDefendAnimationID, false);
     }
     public void OnTogglePause(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
@@ -66,44 +77,36 @@ public class PlayerController : MonoBehaviour
         playerInput.SwitchCurrentActionMap("UI");
     }
     public void EnableGameplayControls() {
-        playerInput.SwitchCurrentActionMap("Gameplay");
+        //playerInput.SwitchCurrentActionMap("Player");
     }
     public void OnJump(InputAction.CallbackContext ctx) {
         if(ctx.started) {
             if (!EventSystem.current.IsPointerOverGameObject() && !GameManager.Instance.IsPaused) // Not clicking on UIs
                 CharacterJump();
         }
-    }
-    public void OnMovement(InputAction.CallbackContext ctx) {
-        if(ctx.started) {
-            CharacterMove(ctx);
-        }
         if(ctx.canceled) {
             CharacterStop();
         }
     }
+    public void OnMoveLeft() {
+        animator.SetBool(playerMovementAnimationID,true);
+        rawInputMovement = new Vector3(-1,0,0);
+        targetRotation.y = 269f;
+    }
+    public void OnMoveRight() {
+        animator.SetBool(playerMovementAnimationID,true);
+        rawInputMovement = new Vector3(1,0,0);
+        targetRotation.y = 91f;
+    }
     void CharacterJump() {
         if(!IsJumping && jumpCounter > 0) {
-            animator.SetTrigger("Jumping");
+            animator.SetTrigger(playerJumpAnimationID);
 
             // Perform jump
             rigidBody.AddForce(new Vector3(0,5,0),ForceMode.Impulse);
         }
     }
-    void CharacterMove(InputAction.CallbackContext ctx) {
-        animator.SetBool(playerMovementAnimationID,true);
-
-        // Move
-        Vector2 inputMovement = ctx.ReadValue<Vector2>();
-        rawInputMovement = new Vector3(inputMovement.x,0,0);
-        if (inputMovement.x > 0) {
-            targetRotation.y = 91f;
-        }
-        if (inputMovement.x < 0) {
-            targetRotation.y = 269f;
-        }
-    }
-    void CharacterStop() {
+    public void CharacterStop() {
         animator.SetBool(playerMovementAnimationID,false);
     }
 
@@ -120,8 +123,6 @@ public class PlayerController : MonoBehaviour
             jumpCounter--;
         }
     }
-
-
     //Update Loop - Used for calculating frame-based data
     void Update() {
         CalculateMovementInputSmoothing();

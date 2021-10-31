@@ -3,57 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : Singleton<CameraManager>
 {
     [Header("Component References")]
     public Camera GameCam;
     public Camera UICam;
-    [Header("Component References")]
-    CinemachineComponentBase componentBase;
-    public GameObject[] OrbitCameras = new GameObject[4];
+    [Header("Pause References")]
+    public GameObject UIPauseCam;
+    public GameObject UIPause;
+    [Header("_")]
     public GameObject LookAtObject;
     public CameraController cameraController;
-
-    bool IsGamePaused = false;
-    float XAxisMaxSpeed;
-    float YAxisMaxSpeed;
     private void Start() {
-        if(LookAtObject != null) {
-            GameObject wCenter = new GameObject();
-            wCenter.transform.position = LookAtObject.transform.position;
-            foreach(var Camera in OrbitCameras) {
-                Camera.GetComponent<CinemachineFreeLook>().m_Follow = wCenter.transform;
-                Camera.GetComponent<CinemachineFreeLook>().m_LookAt = wCenter.transform;
-                XAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed;
-                YAxisMaxSpeed = Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed;
-                Camera.GetComponent<CinemachineFreeLook>().m_XAxis.m_MaxSpeed = 0f;
-                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
-            }
-        }
+        LookAtObject = new GameObject("CharacterPosition");
+        ResetActiveCameraTarget();
     }
-
-    public void PauseMove() {
-        IsGamePaused = !IsGamePaused;
-        if(IsGamePaused) {
-            foreach(var Camera in OrbitCameras) {
-                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
-            }
-        } else {
-            foreach(var Camera in OrbitCameras) {
-                Camera.GetComponent<CinemachineFreeLook>().m_YAxis.m_MaxSpeed = 0f;
-            }
-        }
+    public void ResetActiveCameraTarget() {
+        cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.LookAt = LookAtObject.transform;
+        cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.Follow = LookAtObject.transform;
+    }
+    public void ResetLookAtObjectPosition(Vector3 _newPosition) {
+        LookAtObject.transform.position = _newPosition;
+    }
+    public void PauseGame(bool _b) {
+        UIPause.SetActive(_b);
+        UIPauseCam.SetActive(_b);
     }
     public void RotateCameraLeft() {
-        StartCoroutine(ResetCameraAxis());
         cameraController.SwitchCamera(-1);
     }
     public void RotateCameraRight() {
-        StartCoroutine(ResetCameraAxis());
         cameraController.SwitchCamera(1);
     }
-    IEnumerator ResetCameraAxis() {
-        yield return new WaitForFixedUpdate();
-        cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.VirtualCameraGameObject.GetComponent<CinemachineFreeLook>().m_YAxis.Value = 0.5f;
+    private void Update() {
+        if(LookAtObject != null) {
+            ResetLookAtObjectPosition(GameManager.Instance.playerPrefab.transform.position);
+        }
     }
 }

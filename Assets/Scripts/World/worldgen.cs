@@ -6,10 +6,6 @@ using Random = UnityEngine.Random;
 public class worldgen : MonoBehaviour
 {
     public bool Generate = true;
-    //public GameObject tileToSpawn;
-    //public GameObject dummyCube;
-    //public GameObject treasure;
-    //public Vector3 playerSpawnPoint;
     public bool randomWorld = false;
     [Range(0,100)]
     public int randomFillPercent;

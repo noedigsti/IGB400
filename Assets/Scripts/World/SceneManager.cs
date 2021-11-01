@@ -11,6 +11,7 @@ public class SceneManager : MonoBehaviour
     private void Start() {
         //Instantiate(Player,spawnPoint.transform.position,Quaternion.identity);
         GameManager.Instance.playerPrefab = player;
+        GameManager.Instance.AssignCurrentController(player.GetComponent<PlayerController>());
     }
     public void RestartScene() {
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);

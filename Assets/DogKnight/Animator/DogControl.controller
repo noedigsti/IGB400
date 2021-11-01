@@ -503,7 +503,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WalkForwardBattle
-  m_Speed: 1.2
+  m_Speed: 1.96
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 4132293026090716800}

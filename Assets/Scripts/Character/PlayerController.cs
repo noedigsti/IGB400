@@ -40,8 +40,12 @@ public class PlayerController : MonoBehaviour
 
         rigidBody = GetComponent<Rigidbody>();
 
+        playerInput = GetComponent<PlayerInput>();
+
         SetupAnimation();
 
+    }
+    public void GetCurrentController() {
         GameManager.Instance.AssignCurrentController(this);
     }
     void SetupAnimation() {
@@ -99,7 +103,6 @@ public class PlayerController : MonoBehaviour
         }
     }
     public void CharacterStop() {
-        rawInputMovement = Vector3.zero;
         animator.SetBool(playerMovementAnimationID,false);
     }
 
@@ -113,18 +116,9 @@ public class PlayerController : MonoBehaviour
             }
         }        
     }
-    //private void OnTriggerExit(Collider other) {
-    //    if(other.transform.CompareTag("Floor")) {
-    //        if(jumpCounter <= maxJumpCounters) {
-
-    //            IsJumping = true;
-    //            jumpCounter--; 
-    //        }
-    //    }
-    //}
     //Update Loop - Used for calculating frame-based data
     void Update() {
-        if(!animator.GetBool("Moving") || !animator.GetBool("Defending")) {
+        if(!animator.GetBool(playerMovementAnimationID) || animator.GetBool(playerDefendAnimationID)) {
             rawInputMovement = Vector3.zero;
             smoothInputMovement = Vector3.zero;
         }

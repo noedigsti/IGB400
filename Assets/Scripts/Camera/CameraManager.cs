@@ -15,15 +15,12 @@ public class CameraManager : Singleton<CameraManager>
     public GameObject LookAtObject;
     public CameraController cameraController;
     private void Start() {
-        LookAtObject = new GameObject("CharacterPosition");
+        LookAtObject = GameManager.Instance.playerPrefab;
         ResetActiveCameraTarget();
     }
     public void ResetActiveCameraTarget() {
         cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.LookAt = LookAtObject.transform;
         cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.Follow = LookAtObject.transform;
-    }
-    public void ResetLookAtObjectPosition(Vector3 _newPosition) {
-        LookAtObject.transform.position = _newPosition;
     }
     public void PauseGame(bool _b) {
         UIPause.SetActive(_b);
@@ -34,10 +31,5 @@ public class CameraManager : Singleton<CameraManager>
     }
     public void RotateCameraRight() {
         cameraController.SwitchCamera(1);
-    }
-    private void Update() {
-        if(LookAtObject != null) {
-            ResetLookAtObjectPosition(GameManager.Instance.playerPrefab.transform.position);
-        }
     }
 }

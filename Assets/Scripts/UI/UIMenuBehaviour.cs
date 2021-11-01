@@ -44,6 +44,10 @@ public class UIMenuBehaviour : MonoBehaviour
         GameManager.Instance.TogglePause(_b);
         CameraManager.Instance.PauseGame(_b);
     }
+
+    public void PlayerJump() {
+        playerController.OnCharacterJump();
+    }
     public void PlayerAttack() {
         playerController.OnAttack();
     }
@@ -66,7 +70,7 @@ public class UIMenuBehaviour : MonoBehaviour
         MovingCharacterLeft = false;
         playerController.CharacterStop();
     }
-    private void LateUpdate() {
+    private void Update() {
         if(MovingCharacterLeft) {
             playerController.OnMoveLeft();
         }

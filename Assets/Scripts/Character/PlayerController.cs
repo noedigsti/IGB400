@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [Header("_Movement Behaviour Section")]
     int jumpCounter;
     public int maxJumpCounters = 1;
+    public float jumpVelocity = 6f;
     bool IsJumping = false;
 
     public float movementSpeed = 3f;
@@ -60,7 +61,6 @@ public class PlayerController : MonoBehaviour
     public void OnDefend() {
         CharacterStop();
         animator.SetBool(playerDefendAnimationID, true);
-        animator.Play("Defend");
     }
     public void OnNotDefend() {
         animator.SetBool(playerDefendAnimationID, false);
@@ -79,15 +79,6 @@ public class PlayerController : MonoBehaviour
     public void EnableGameplayControls() {
         //playerInput.SwitchCurrentActionMap("Player");
     }
-    public void OnJump(InputAction.CallbackContext ctx) {
-        if(ctx.started) {
-            if (!EventSystem.current.IsPointerOverGameObject() && !GameManager.Instance.IsPaused) // Not clicking on UIs
-                CharacterJump();
-        }
-        if(ctx.canceled) {
-            CharacterStop();
-        }
-    }
     public void OnMoveLeft() {
         animator.SetBool(playerMovementAnimationID,true);
         rawInputMovement = new Vector3(-1,0,0);
@@ -98,35 +89,57 @@ public class PlayerController : MonoBehaviour
         rawInputMovement = new Vector3(1,0,0);
         targetRotation.y = 91f;
     }
-    void CharacterJump() {
+    public void OnCharacterJump() {
         if(!IsJumping && jumpCounter > 0) {
             animator.SetTrigger(playerJumpAnimationID);
-
+            jumpCounter--;
+            IsJumping = true;
             // Perform jump
-            rigidBody.AddForce(new Vector3(0,5,0),ForceMode.Impulse);
+            //rigidBody.AddForce(new Vector3(0,jumpForce,0),ForceMode.Impulse);
         }
     }
     public void CharacterStop() {
+        rawInputMovement = Vector3.zero;
         animator.SetBool(playerMovementAnimationID,false);
     }
 
 
-    private void OnTriggerStay(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         if(other.transform.CompareTag("Floor")) {
-            IsJumping = false;
-            jumpCounter = maxJumpCounters;
+            if(jumpCounter <= 0) {
+
+                IsJumping = false;
+                jumpCounter = maxJumpCounters; 
+            }
         }        
     }
-    private void OnTriggerExit(Collider other) {
-        if(other.transform.CompareTag("Floor")) {
-            IsJumping = true;
-            jumpCounter--;
-        }
-    }
+    //private void OnTriggerExit(Collider other) {
+    //    if(other.transform.CompareTag("Floor")) {
+    //        if(jumpCounter <= maxJumpCounters) {
+
+    //            IsJumping = true;
+    //            jumpCounter--; 
+    //        }
+    //    }
+    //}
     //Update Loop - Used for calculating frame-based data
     void Update() {
+        if(!animator.GetBool("Moving") || !animator.GetBool("Defending")) {
+            rawInputMovement = Vector3.zero;
+            smoothInputMovement = Vector3.zero;
+        }
+        
         CalculateMovementInputSmoothing();
         UpdatePlayerMovement();
+
+        MoveThePlayer();
+        TurnThePlayer();
+    }
+    void FixedUpdate() {
+        if(IsJumping) {
+            rigidBody.velocity += new Vector3(0,jumpVelocity,0);
+            IsJumping = false;
+        }
     }
 
     //Input's Axes values are raw
@@ -139,16 +152,7 @@ public class PlayerController : MonoBehaviour
     public void UpdateMovementData(Vector3 newMovementDirection) {
         movementDirection = newMovementDirection;
     }
-
-    void FixedUpdate() {
-        MoveThePlayer();
-        TurnThePlayer();
-    }
     void MoveThePlayer() {
-        if(!animator.GetBool("Moving")) {
-            rawInputMovement = Vector3.zero;
-            smoothInputMovement = Vector3.zero;
-        }
         Vector3 movement = movementDirection * movementSpeed * Time.deltaTime;
         rigidBody.MovePosition(transform.position + movement);
     }

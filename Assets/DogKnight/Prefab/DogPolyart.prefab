@@ -1265,11 +1265,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxJumpCounters: 1
+  jumpForce: 3
   jumpVelocity: 5
   movementSpeed: 3.5
   movementSmoothingSpeed: 1
-  turnspeed: 15
+  turnspeed: 14
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 1
   rigidBody: {fileID: 0}
+  capCol: {fileID: 0}
   playerInput: {fileID: 3300699933195519917}
   animator: {fileID: 0}
 --- !u!95 &2066896392029128874

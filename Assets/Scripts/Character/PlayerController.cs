@@ -1,12 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("_Character Gameplay State Section")]
+    [Range(0,100)]
+    [SerializeField] int health = 100;
+    [Range(0,100)]
+    [SerializeField] float healthDecimal = 100f;
+    public float GetPlayerCurrentHP => health;
+    [SerializeField] bool IsDead = false;
+    [SerializeField] float maxHealth = 100f;
+    public float GetPlayerMaxHP => maxHealth;
     [SerializeField] bool IsAttacking = false;
     [SerializeField] bool IsDefending = false;
     [SerializeField] bool IsMoving = false;
@@ -14,8 +21,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool IsJumping = false;
 
     [Header("_Character Gameplay Components Section")]
+    public CapsuleCollider attackHitbox;
+
     public GameObject m_BarrierShield;
     [SerializeField] bool BarrierShieldEnabled = false;
+    public SphereCollider shieldHitbox;
+
     public GameObject m_SwordVFX_Glow;
     [SerializeField] bool SwordGlowEnabled = false;
     public GameObject m_SwordVFX_Trail;
@@ -50,11 +61,15 @@ public class PlayerController : MonoBehaviour
 
     [Header("_Animator Section")]
     public Animator animator;
-    int playerMovementAnimationID;
-    int playerRunAnimationID;
-    int playerJumpAnimationID;
-    int playerAttackAnimationID;
-    int playerDefendAnimationID;
+    int playerMovementAnimationPID;
+    int playerRunAnimationPID;
+    int playerJumpAnimationPID;
+    int playerAttackAnimationPID;
+    int playerAttack2AnimationPID;
+    int playerDefendAnimationPID;
+    int playerGotHitAnimationPID;
+    int playerStunnedAnimationPID;
+    int playerDieAnimationPID;
 
     private void Start() {
         jumpCounter = maxJumpCounters;
@@ -68,9 +83,17 @@ public class PlayerController : MonoBehaviour
         SetupDefaultCharacterGameplayComponents(true);
 
         SetupAnimations();
+
+        SetupPlayerStats();
+    }
+    void SetupPlayerStats() {
+        healthDecimal = maxHealth;
+        health = Mathf.RoundToInt(healthDecimal);
+        IsDead = false;
     }
     void SetupDefaultCharacterGameplayComponents(bool _b) {
         m_BarrierShield.SetActive(_b);
+        shieldHitbox = m_BarrierShield.GetComponent<SphereCollider>();
         m_SwordVFX_Trail.SetActive(_b);
         m_SwordVFX_Glow.SetActive(_b);
     }
@@ -79,11 +102,15 @@ public class PlayerController : MonoBehaviour
     }
     void SetupAnimations() {
         animator = GetComponent<Animator>();
-        playerMovementAnimationID =  Animator.StringToHash("Moving");
-        playerRunAnimationID =  Animator.StringToHash("Running");
-        playerJumpAnimationID =  Animator.StringToHash("Jumping");
-        playerAttackAnimationID =  Animator.StringToHash("Attacking");
-        playerDefendAnimationID =  Animator.StringToHash("Defending");
+        playerMovementAnimationPID =  Animator.StringToHash("Moving");
+        playerRunAnimationPID =  Animator.StringToHash("Running");
+        playerJumpAnimationPID =  Animator.StringToHash("Jumping");
+        playerAttackAnimationPID =  Animator.StringToHash("Attacking");
+        playerAttack2AnimationPID =  Animator.StringToHash("Attacking 2");
+        playerDefendAnimationPID =  Animator.StringToHash("Defending");
+        playerGotHitAnimationPID =  Animator.StringToHash("GettingHit");
+        playerStunnedAnimationPID =  Animator.StringToHash("Stunned");
+        playerDieAnimationPID =  Animator.StringToHash("Dead");
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -103,17 +130,43 @@ public class PlayerController : MonoBehaviour
     public InputActionAsset GetInputActionAsset() {
         return playerInput.actions;
     }
+    public void EnablePauseMenuControls() {
+        //playerInput.SwitchCurrentActionMap("UI");
+    }
+    public void EnableGameplayControls() {
+        //playerInput.SwitchCurrentActionMap("Player");
+    }
     public void OnAttack() {
         CharacterStop();
-        animator.SetTrigger(playerAttackAnimationID);
+
+        // Random switching between 2 attack animation states/ clips
+        if (Random.Range(1,3) == 1) {
+            animator.SetTrigger(playerAttackAnimationPID);
+        } else {
+            animator.SetTrigger(playerAttack2AnimationPID);
+        }
         SwordTrailEnabled = true;
     }
     public void OnDefend() {
         CharacterStop();
-        animator.SetBool(playerDefendAnimationID, true);
+        animator.SetBool(playerDefendAnimationPID, true);
     }
     public void OnNotDefend() {
-        animator.SetBool(playerDefendAnimationID, false);
+        animator.SetBool(playerDefendAnimationPID, false);
+    }
+    public void OnTakeDamage(float _damage) {
+        animator.SetTrigger(playerGotHitAnimationPID);
+        OnGetStunned();
+    }
+    public void OnGetStunned() {
+        animator.SetTrigger(playerStunnedAnimationPID);
+    }
+    public void OnDead() {
+        animator.SetBool(playerDieAnimationPID,true);
+        DieSequence();
+    }
+    void DieSequence() {
+        IsDead = true;
     }
     public void OnTogglePause(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
@@ -123,14 +176,8 @@ public class PlayerController : MonoBehaviour
     public void OnGamePause() {
         Debug.Log("Toggle Pause");
     }
-    public void EnablePauseMenuControls() {
-        //playerInput.SwitchCurrentActionMap("UI");
-    }
-    public void EnableGameplayControls() {
-        //playerInput.SwitchCurrentActionMap("Player");
-    }
     public void OnMoveLeft(bool _isRunning) {
-        animator.SetBool(playerMovementAnimationID,true);
+        animator.SetBool(playerMovementAnimationPID,true);
         rawInputMovement = new Vector3(-1,0,0);
         targetRotation.y = 269f;
         if(_isRunning) {
@@ -138,7 +185,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     public void OnMoveRight(bool _isRunning) {
-        animator.SetBool(playerMovementAnimationID,true);
+        animator.SetBool(playerMovementAnimationPID,true);
         rawInputMovement = new Vector3(1,0,0);
         targetRotation.y = 91f;
         if(_isRunning) {
@@ -148,21 +195,23 @@ public class PlayerController : MonoBehaviour
     public void OnRunnning() {
         if(IsMoving) {
             movementSpeed = runSpeed;
-            animator.SetBool(playerRunAnimationID,true);
+            animator.SetBool(playerRunAnimationPID,true);
         }
     }
     public void OnCharacterJump() {
         if(!IsJumping && jumpCounter > 0) {
-            animator.SetTrigger(playerJumpAnimationID);
+            animator.SetTrigger(playerJumpAnimationPID);
             jumpCounter--;
             IsJumping = true;
         }
     }
     public void CharacterStop() {
-        animator.SetBool(playerMovementAnimationID,false);
-        animator.SetBool(playerRunAnimationID,false);
-        //animator.SetBool(playerAttackAnimationID,false); // trail vfx depends on this
-        animator.SetBool(playerDefendAnimationID,false);
+        animator.ResetTrigger(playerAttackAnimationPID);
+        animator.ResetTrigger(playerAttack2AnimationPID);
+        animator.SetBool(playerMovementAnimationPID,false);
+        animator.SetBool(playerRunAnimationPID,false);
+        //animator.SetBool(playerAttackAnimationPID,false); // trail vfx depends on this
+        animator.SetBool(playerDefendAnimationPID,false);
         movementSpeed = movementSpeedDefault;
     }
 
@@ -170,11 +219,23 @@ public class PlayerController : MonoBehaviour
 
     //Update Loop - Used for calculating frame-based data
     void Update() {
-        if(!animator.GetBool(playerMovementAnimationID) || animator.GetBool(playerDefendAnimationID)) {
+        // Stats and state checks
+        if(!IsDead) {
+            if(health > 1) {
+                healthDecimal -= Time.deltaTime;
+                health = Mathf.RoundToInt(healthDecimal);
+            } else {
+                OnDead();
+            }
+        } else {
+
+        }
+
+        if(!animator.GetBool(playerMovementAnimationPID) || animator.GetBool(playerDefendAnimationPID)) {
             rawInputMovement = Vector3.zero;
             smoothInputMovement = Vector3.zero;
         }
-        
+
         if(IsJumping && IsGrounded()) {
             rigidBody.AddForce(Vector3.up * jumpForce,ForceMode.Impulse);
             IsJumping = false;
@@ -185,9 +246,9 @@ public class PlayerController : MonoBehaviour
         MoveThePlayer();
         TurnThePlayer();
 
+        UpdateCharacterGameplayComponents();
         UpdateCharacterAnimationStates();
 
-        UpdateCharacterGameplayComponents();
         UpdateCharacterVFX();
     }
 
@@ -202,10 +263,11 @@ public class PlayerController : MonoBehaviour
                 IsAttacking = false;
             }
         }
-        if(animator.GetBool("Defending")) {
+        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Defend") || IsDefending) {
             IsDefending = true;
-        } else {
-            IsDefending = false;
+            if(animator.GetAnimatorTransitionInfo(0).IsUserName("DefendToIdle")){
+                IsDefending = false;
+            }
         }
         if(animator.GetBool("Moving")) {
             IsMoving = true;
@@ -249,7 +311,9 @@ public class PlayerController : MonoBehaviour
                 m_SwordVFX_Trail.SetActive(true);
                 m_SwordVFX_Trail.GetComponent<ParticleSystem>().Play();
             }
-            if(animator.GetAnimatorTransitionInfo(0).IsUserName("AttackToIdle") || !IsAttacking) {
+            if(animator.GetAnimatorTransitionInfo(0).IsUserName("Attack1ToIdle") 
+                || animator.GetAnimatorTransitionInfo(0).IsUserName("Attack2ToIdle")
+                || !IsAttacking) {
                 SwordTrailEnabled = false;
                 m_SwordVFX_Trail.SetActive(false);
                 m_SwordVFX_Trail.GetComponent<ParticleSystem>().Stop();

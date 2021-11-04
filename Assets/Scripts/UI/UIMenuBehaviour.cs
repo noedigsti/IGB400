@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class UIMenuBehaviour : MonoBehaviour
@@ -9,6 +8,7 @@ public class UIMenuBehaviour : MonoBehaviour
     public Button pauseButton;
     public GameObject PauseCanvas;
     public PlayerController playerController;
+    public Slider playerHPBar;
     public void SetupBehaviour() {
         SetupPlayerController();
     }
@@ -97,12 +97,16 @@ public class UIMenuBehaviour : MonoBehaviour
         }
     }
     private void Update() {
+        playerHPBar.value = playerController.GetPlayerCurrentHP;
+
         if(MovingCharacterLeft) {
             playerController.OnMoveLeft(RunCharacter);
         }
         if(MovingCharacterRight) {
             playerController.OnMoveRight(RunCharacter);
-
         }
+    }
+    public void test(float _damage) {
+        playerController.OnTakeDamage(_damage);
     }
 }

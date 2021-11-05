@@ -7,6 +7,8 @@ TagManager:
   - Spawn Point
   - Floor
   - Hitbox
+  - Destination
+  - GameUI
   layers:
   - Default
   - TransparentFX

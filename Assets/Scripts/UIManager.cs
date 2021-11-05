@@ -9,7 +9,7 @@ public class UIManager : Singleton<UIManager>
     public void SetupUIManager() {
         uiBehaviour.SetupBehaviour();
     }
-    public void UpdateUIMenuState(bool _state) {
+    public void UpdateUIMenuPauseState(bool _state) {
         uiBehaviour.UpdateUIMenuState(_state);
     }
 }

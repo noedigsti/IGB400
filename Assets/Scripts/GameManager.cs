@@ -42,6 +42,6 @@ public class GameManager : Singleton<GameManager>
         }
     }
     void ToggleUIPause(bool _b) {
-        UIManager.Instance.UpdateUIMenuState(_b);
+        UIManager.Instance.UpdateUIMenuPauseState(_b);
     }
 }

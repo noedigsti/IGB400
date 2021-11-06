@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum CharacterState
+{
+    Idle,
+    IsAttacking,
+    IsDefending,
+    IsMoving,
+    IsRunning,
+    IsGrounded,
+}
 public class PlayerController : MonoBehaviour
 {
     [Header("_Debug")]
@@ -31,6 +40,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool IsRunning = false;
     [SerializeField] bool CanJump = false;
     [SerializeField] bool IsGrounded = false;
+    public CharacterState CurrentCharacterState {
+        get {
+            if(IsAttacking) return CharacterState.IsAttacking;
+            if(IsDefending) return CharacterState.IsDefending;
+            if(IsMoving) return CharacterState.IsMoving;
+            if(IsRunning) return CharacterState.IsRunning;
+            return CharacterState.Idle;
+        }
+    }
 
     [Header("_Character Gameplay Components Section")]
     public CapsuleCollider attackHitbox;
@@ -98,7 +116,6 @@ public class PlayerController : MonoBehaviour
         SetupDefaultCharacterGameplayComponents(true);
 
         SetupAnimations();
-
     }
     private void OnEnable() {
         SetupPlayerStats();
@@ -128,6 +145,7 @@ public class PlayerController : MonoBehaviour
         shieldHitbox = m_BarrierShield.GetComponent<SphereCollider>();
         m_SwordVFX_Trail.SetActive(_b);
         m_SwordVFX_Glow.SetActive(_b);
+        attackHitbox.GetComponent<HitboxTrigger>().TargetTagname = "Enemy";
     }
     void SetupAnimations() {
         animator = GetComponent<Animator>();
@@ -231,8 +249,11 @@ public class PlayerController : MonoBehaviour
     }
     public void OnCharacterJump() {
         jumpCounter--;
-        animator.SetTrigger(playerJumpAnimationPID);
-        CanJump = true;
+        if (jumpCounter < maxJumpCounter
+            && jumpCounter >= 0) {
+            animator.SetTrigger(playerJumpAnimationPID);
+            CanJump = true;
+        }
     }
     public void CharacterStop() {
         animator.ResetTrigger(playerAttackAnimationPID);
@@ -254,7 +275,24 @@ public class PlayerController : MonoBehaviour
 
         UpdateCharacterGameplayComponents();
         
+        UpdateAftermath();
+
         UpdateCharacterVFX();
+
+        //Debug.Log(CurrentCharacterState.ToString());
+    }
+    
+    ////////////////////////////////////////////////////////////////////
+
+    void UpdateAftermath() {
+        
+    }
+
+    ////////////////////////////////////////////////////////////////////
+
+    public void AttackTarget(GameObject _obj) {
+        Debug.Log("Attacked " + _obj.name);
+
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -263,8 +301,11 @@ public class PlayerController : MonoBehaviour
         // Stats and state checks
         if(!IsDead && DeathCheck) {
             if(health > 1) {
+
+                // TEST HP
                 healthDecimal -= Time.deltaTime;
                 health = Mathf.RoundToInt(healthDecimal);
+
             } else {
                 OnDead();
             }
@@ -277,16 +318,18 @@ public class PlayerController : MonoBehaviour
             && CanJump
             ) {
             rigidBody.AddForce(Vector3.up * jumpForce,ForceMode.Impulse);
+            animator.ResetTrigger(playerJumpAnimationPID);
             CanJump = false;
         }
         CheckGrounded();
-        // /Jump
     }
 
     ////////////////////////////////////////////////////////////////////
 
     void UpdateCharacterAnimationStates() {
         if(animator.GetAnimatorTransitionInfo(0).IsUserName("IdleToAttack") 
+            || animator.GetCurrentAnimatorStateInfo(0).IsName("Attack01")
+            || animator.GetCurrentAnimatorStateInfo(0).IsName("Attack02")
             || IsAttacking) {
             IsAttacking = true;
             if(!animator.IsInTransition(0)
@@ -294,7 +337,7 @@ public class PlayerController : MonoBehaviour
                 IsAttacking = false;
             }
         }
-        if(animator.GetCurrentAnimatorStateInfo(0).IsName("bDefend") 
+        if(animator.GetCurrentAnimatorStateInfo(0).IsName("Defend") 
             || IsDefending) {
             IsDefending = true;
             if(animator.GetAnimatorTransitionInfo(0).IsUserName("DefendToIdle")){
@@ -318,10 +361,14 @@ public class PlayerController : MonoBehaviour
             smoothInputMovement = Vector3.zero;
         }
 
-        CalculateMovementInputSmoothing();
-        UpdatePlayerMovement();
+        if(!IsAttacking && !IsDefending) {
 
-        MoveThePlayer();
+            CalculateMovementInputSmoothing();
+            UpdatePlayerMovement();
+
+            MoveThePlayer(); 
+        }
+
         TurnThePlayer();
     }
 
@@ -351,6 +398,14 @@ public class PlayerController : MonoBehaviour
 
     ////////////////////////////////////////////////////////////////////
     void UpdateCharacterGameplayComponents() {
+        if(IsAttacking) {
+            if(!attackHitbox.gameObject.activeSelf) {
+                attackHitbox.gameObject.SetActive(true);
+            }
+        } else {
+            attackHitbox.gameObject.SetActive(false);
+        }
+
         if(BarrierShieldEnabled) {
             m_BarrierShield.SetActive(true);
         } else {

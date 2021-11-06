@@ -13,7 +13,7 @@ public class UIMenuBehaviour : MonoBehaviour
     private void Awake() {
         EnhancedTouchSupport.Enable();
     }
-
+    public Canvas uiCanvas;
     public GameObject tapArea;
     public GameObject buttonMoveLeft;
     public GameObject buttonMoveRight;
@@ -62,16 +62,10 @@ public class UIMenuBehaviour : MonoBehaviour
     }
 
     public void PlayerJump() {
-
         playerController.OnCharacterJump();
     }
-    bool Attacking = false;
     public void PlayerAttack() {
-        if(Touch.activeTouches.Count > 0) {
-            Debug.Log("Attackkk");
-            Attacking = true;
-            playerController.OnAttack();
-        }
+        playerController.OnAttack();
     }
     public void PlayerDefend() {
         playerController.OnDefend();
@@ -87,31 +81,24 @@ public class UIMenuBehaviour : MonoBehaviour
     bool RunCharacter = false;
     byte counterL = 0;
     byte counterR = 0;
-    bool MovingCharacterLeft = false;
+    bool MoveCharacterLeft = false;
+    bool MoveCharacterRight = false;
     public void PlayerMoveLeft() {
-        if(Touch.activeTouches.Count > 0) {
-
-            if(counterL++ >= 1) {
-                RunCharacter = true;
-            }
-            MovingCharacterLeft = true; 
+        if(counterL++ >= 1) {
+            RunCharacter = true;
         }
+        MoveCharacterLeft = true;
     }
-    bool MovingCharacterRight = false;
     public void PlayerMoveRight() {
-        if(Touch.activeTouches.Count > 0) {
-
-            if(counterR++ >= 1) {
-                RunCharacter = true;
-            }
-            MovingCharacterRight = true; 
+        if(counterR++ >= 1) {
+            RunCharacter = true;
         }
+        MoveCharacterRight = true;
     }
     public void PlayerStopMove() {
         SetEmpty();
-        Attacking = false;
-        MovingCharacterRight = false;
-        MovingCharacterLeft = false;
+        MoveCharacterRight = false;
+        MoveCharacterLeft = false;
         StartCoroutine(ToggleRunCharacter(playerController.RunDelayTimer));
         playerController.CharacterStop();
     }
@@ -138,80 +125,70 @@ public class UIMenuBehaviour : MonoBehaviour
     }
     private void Update() {
         if (Touch.activeFingers.Count > 0) {
+
+            // Going through the active touches on the screen
             foreach(var touch in Touch.activeTouches) {
-
-                Debug.Log("Finger Index = " + touch.finger.index);
+                //Debug.Log("Finger Index = " + touch.finger.index);
                 //Debug.Log("Touch Index = " + touch.touchId);
-                if (EventSystemManager.Instance.eventSystem.currentSelectedGameObject != null) {
-                    //Debug.Log(EventSystemManager.Instance.eventSystem.currentSelectedGameObject.name);
-                }
-                if(IsPointerOverUIObject(touch)) {
-                    //if(EventSystemManager.Instance.eventSystem.IsPointerOverGameObject(touch.finger.index)) {
-                    //Debug.Log("Over UI");
-                    //if(EventSystem.current.IsPointerOverGameObject(touch.finger.index)) {
-                    //PointerEventData pointer = new PointerEventData(EventSystemManager.Instance.eventSystem);
-                    //pointer.position = touch.startScreenPosition;
 
-                    //List<RaycastResult> raycastResults = new List<RaycastResult>();
-                    //EventSystemManager.Instance.eventSystem.RaycastAll(pointer,raycastResults);
 
-                    //if(raycastResults.Count > 0) {
-                    //    foreach(var go in raycastResults) {
-                    //        Debug.Log(go.gameObject.name);
-                    //    }
-                    //}
+                GameObject target = IsPointerOverUIObject(uiCanvas,touch.startScreenPosition,"GameUI");
+                if (target != null) {
+                    //Debug.Log(target.name);
+                    switch(target.name) {
+                        case "Jump":
+                            PlayerJump(); 
+                            break;
+                        case "Attack":
+                            //playerController.OnAttack();
+                            break;
+                        case "Defending":
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                if(MovingCharacterLeft) {
-                    playerController.OnMoveLeft(RunCharacter);
-                }
-                if(MovingCharacterRight) {
-                    playerController.OnMoveRight(RunCharacter);
-                }
-                if(touch.startScreenPosition.y > Screen.currentResolution.height * .25f) {
-                    PlayerJump();
+                if (playerController.CurrentCharacterState != CharacterState.IsAttacking
+                    &&
+                    playerController.CurrentCharacterState != CharacterState.IsDefending) {
+                    if(MoveCharacterLeft) {
+                        playerController.OnMoveLeft(RunCharacter);
+                    }
+                    if(MoveCharacterRight) {
+                        playerController.OnMoveRight(RunCharacter);
+                    }
                 }
             }
         } else {
             PlayerStopMove();
         }
     }
-    /// <summary>
-    /// Cast a ray to test if Input.mousePosition is over any UI object in EventSystem.current. This is a replacement
-    /// for IsPointerOverGameObject() which does not work on Android in 4.6.0f3
-    /// </summary>
-    private bool IsPointerOverUIObject(Touch _touch) {
-        // Referencing this code for GraphicRaycaster https://gist.github.com/stramit/ead7ca1f432f3c0f181f
-        // the ray cast appears to require only eventData.position.
-        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = _touch.startScreenPosition;
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventDataCurrentPosition,results);
-        if(results.Count > 0) {
-            foreach(var go in results) {
-                //Debug.Log(go.gameObject.name);
-                if(go.gameObject.transform.CompareTag("GameUI")) {
-                    Debug.Log(go.gameObject.name);
-                }
-            }
-        }
-        return results.Count > 0;
-    }
 
     /// <summary>
     /// Cast a ray to test if screenPosition is over any UI object in canvas. This is a replacement
     /// for IsPointerOverGameObject() which does not work on Android in 4.6.0f3
+    /// 
+    /// <para>MODIFIED</para>
     /// </summary>
-    private bool IsPointerOverUIObject(Canvas canvas,Vector2 screenPosition) {
+    private GameObject IsPointerOverUIObject(/*Touch _touch,*/ Canvas canvas,Vector2 screenPosition, string _tag) {
         // Referencing this code for GraphicRaycaster https://gist.github.com/stramit/ead7ca1f432f3c0f181f
         // the ray cast appears to require only eventData.position.
         PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = screenPosition;
+        eventDataCurrentPosition.position = screenPosition /*_touch.startScreenPosition*/;
 
         GraphicRaycaster uiRaycaster = canvas.gameObject.GetComponent<GraphicRaycaster>();
         List<RaycastResult> results = new List<RaycastResult>();
+        //EventSystem.current.RaycastAll(eventDataCurrentPosition,results);
         uiRaycaster.Raycast(eventDataCurrentPosition,results);
-        return results.Count > 0;
+        if(results.Count > 0) {
+            foreach(var go in results) {
+                if(go.gameObject.transform.CompareTag(_tag)) {
+                    // Do something if such gameobject identified
+                    return go.gameObject;
+                }
+            }
+        }
+        return null;
     }
     public void test(float _damage) {
         playerController.OnTakeDamage(_damage);

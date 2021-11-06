@@ -23,7 +23,7 @@ public class HitboxTrigger : MonoBehaviour
         col = GetComponent<CapsuleCollider>();
     }
     private void OnTriggerEnter(Collider other) {
-        if(other.transform.CompareTag(targetTag)) {
+        if(other.transform.CompareTag(targetTag) && other.isTrigger) {
             target = other.gameObject;
             controller.AttackTarget(target);
         }

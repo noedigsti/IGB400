@@ -20,12 +20,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float groundCheckColliderOffset = 0.5f;
 
     [Header("_Character Gameplay State Section")]
+    [SerializeField] int score = 0;
+    public float GetPlayerScore => score;
+
     [Range(0,100)]
     [SerializeField] int health = 100;
     [Range(0,100)]
     [SerializeField] float healthDecimal = 100f;
     public float GetPlayerCurrentHP => health;
     [SerializeField] float maxHealth = 100f;
+    [SerializeField] float attackPower = 10f;
+    [SerializeField] float attackPowerDefault = 10f;
+    [SerializeField] float attackPowerCap = 20f;
+
     [SerializeField] bool IsDead = false;
     [SerializeField] bool DeathCheck = true;
     [Range(0,5)]
@@ -36,10 +43,12 @@ public class PlayerController : MonoBehaviour
     public float GetPlayerMaxHP => maxHealth;
     [SerializeField] bool IsAttacking = false;
     [SerializeField] bool IsDefending = false;
+    [SerializeField] bool IsGettingHit = false;
     [SerializeField] bool IsMoving = false;
     [SerializeField] bool IsRunning = false;
     [SerializeField] bool CanJump = false;
     [SerializeField] bool IsGrounded = false;
+    [SerializeField] int KilledOnce = 0;
     public CharacterState CurrentCharacterState {
         get {
             if(IsAttacking) return CharacterState.IsAttacking;
@@ -57,8 +66,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool BarrierShieldEnabled = false;
     public SphereCollider shieldHitbox;
 
-    public GameObject m_SwordVFX_Glow;
     [SerializeField] bool SwordGlowEnabled = false;
+    public GameObject m_SwordVFX_Glow;
+    public GameObject m_SwordVFX_GlowEnrage;
     public GameObject m_SwordVFX_Trail;
     [SerializeField] bool SwordTrailEnabled = false;
 
@@ -139,6 +149,7 @@ public class PlayerController : MonoBehaviour
         IsDead = false;
         shieldCount = maxAvailableShields;
         DeathCheck = true;
+        attackPower = attackPowerDefault;
     }
     void SetupDefaultCharacterGameplayComponents(bool _b) {
         m_BarrierShield.SetActive(_b);
@@ -198,30 +209,37 @@ public class PlayerController : MonoBehaviour
     public void OnDefend() {
         CharacterStop();
         if (shieldCount > 0) {
-            //shieldCount--;
+            //shieldCount--; // Available shields
             animator.SetBool(playerDefendAnimationPID, true);
         }
     }
     public void OnNotDefend() {
         animator.SetBool(playerDefendAnimationPID, false);
     }
-    public void OnTakeDamage(float _damage) {
-        animator.SetTrigger(playerGotHitAnimationPID);
-        OnGetStunned();
-    }
+    //public void OnTakeDamage(float _damage) {
+    //    animator.SetTrigger(playerGotHitAnimationPID);
+    //    OnGetStunned();
+    //}
     public void OnGetStunned() {
         animator.SetTrigger(playerStunnedAnimationPID);
     }
     public void OnDead() {
+        CharacterStop();
         animator.SetBool(playerDeadAnimationPID,true);
-        DieSequence();
+        StartCoroutine(DieSequence());
     }
-    void DieSequence() {
+    IEnumerator DieSequence() {
         IsDead = true;
+        animator.Play("Die");
+        yield return new WaitUntil(() =>
+            animator.GetCurrentAnimatorStateInfo(0).IsName("Die")
+            && animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1
+        );
+        UIManager.Instance.uiBehaviour.RestartLevel();
     }
     public void OnRevive() {
-        DeathCheck = false;
         IsDead = false;
+        healthDecimal = maxHealth;
         animator.SetBool(playerDeadAnimationPID,false);
         animator.SetTrigger(playerReviveAnimationPID);
     }
@@ -269,15 +287,18 @@ public class PlayerController : MonoBehaviour
 
     //Update Loop - Used for calculating frame-based data
     void Update() {
-        UpdateCharacterGameplayStates();
+        //UpdateCharacterGameplayStates();
 
-        UpdateCharacterAnimationStates();
+        if(UpdateCharacterGameplayStates()) {
 
-        UpdateCharacterGameplayComponents();
-        
-        UpdateAftermath();
+            UpdateCharacterAnimationStates();
 
-        UpdateCharacterVFX();
+            UpdateCharacterGameplayComponents();
+
+            UpdateAftermath();
+
+            UpdateCharacterVFX(); 
+        }
 
         //Debug.Log(CurrentCharacterState.ToString());
     }
@@ -289,39 +310,62 @@ public class PlayerController : MonoBehaviour
     }
 
     ////////////////////////////////////////////////////////////////////
-
+    public void TakeDamage(float _damage) {
+        if(!IsDefending) {
+            healthDecimal -= _damage;
+            health = Mathf.RoundToInt(healthDecimal);
+            CharacterStop();
+            animator.Play("GetHit");
+        }
+    }
     public void AttackTarget(GameObject _obj) {
-        Debug.Log("Attacked " + _obj.name);
+        EnemyController ctl = _obj.GetComponent<EnemyController>();
+        ctl.TakeDamage(attackPower);
+        if(ctl.IsDead) {
+            Debug.Log("Killed " + _obj.name);
+            StartCoroutine(ToggleSwordGlow());
 
+            score += 100; // SCORE
+        } 
+    }
+
+    IEnumerator ToggleSwordGlow() {
+        KilledOnce++;
+        attackPower = attackPowerCap;
+        yield return new WaitForSeconds(3f); // Timer
+        KilledOnce = 0;
+        attackPower = attackPowerDefault;
     }
 
     ////////////////////////////////////////////////////////////////////
 
-    void UpdateCharacterGameplayStates() {
+    bool UpdateCharacterGameplayStates() {
         // Stats and state checks
         if(!IsDead && DeathCheck) {
+            health = Mathf.RoundToInt(healthDecimal);
             if(health > 1) {
 
                 // TEST HP
-                healthDecimal -= Time.deltaTime;
-                health = Mathf.RoundToInt(healthDecimal);
+                //healthDecimal -= Time.deltaTime;
+                //
+                // Jump
+                if(jumpCounter > 0
+                    && CanJump
+                    ) {
+                    rigidBody.AddForce(Vector3.up * jumpForce,ForceMode.Impulse);
+                    animator.ResetTrigger(playerJumpAnimationPID);
+                    CanJump = false;
+                }
+                CheckGrounded();
+                return true;
 
             } else {
                 OnDead();
+                return false;
             }
         } else {
-
+            return false;
         }
-
-        // Jump
-        if(jumpCounter > 0
-            && CanJump
-            ) {
-            rigidBody.AddForce(Vector3.up * jumpForce,ForceMode.Impulse);
-            animator.ResetTrigger(playerJumpAnimationPID);
-            CanJump = false;
-        }
-        CheckGrounded();
     }
 
     ////////////////////////////////////////////////////////////////////
@@ -354,6 +398,13 @@ public class PlayerController : MonoBehaviour
         } else {
             IsRunning = false;
         }
+        if(animator.GetCurrentAnimatorStateInfo(0).IsName("GetHit")
+           || IsGettingHit) {
+            IsGettingHit = true;
+            if(animator.GetAnimatorTransitionInfo(0).IsUserName("GetHitToIdle")) {
+                IsGettingHit = false;
+            }
+        }
 
         if(!animator.GetBool(playerMovementAnimationPID)
             || animator.GetBool(playerDefendAnimationPID)) {
@@ -361,7 +412,7 @@ public class PlayerController : MonoBehaviour
             smoothInputMovement = Vector3.zero;
         }
 
-        if(!IsAttacking && !IsDefending) {
+        if(!IsAttacking && !IsDefending && !IsGettingHit) {
 
             CalculateMovementInputSmoothing();
             UpdatePlayerMovement();
@@ -418,9 +469,22 @@ public class PlayerController : MonoBehaviour
     void UpdateCharacterVFX() {
         // Enable when upgraded
         if(SwordGlowEnabled) {
-            if(!m_SwordVFX_Glow.activeSelf) {
-                m_SwordVFX_Glow.SetActive(true);
-                m_SwordVFX_Glow.GetComponent<ParticleSystem>().Play(); 
+            if(KilledOnce == 0) {
+                m_SwordVFX_GlowEnrage.GetComponent<ParticleSystem>().Stop();
+                m_SwordVFX_GlowEnrage.SetActive(false);
+
+                if(!m_SwordVFX_Glow.activeSelf) {
+                    m_SwordVFX_Glow.SetActive(true);
+                    m_SwordVFX_Glow.GetComponent<ParticleSystem>().Play(); 
+                }
+            } else {
+                m_SwordVFX_Glow.GetComponent<ParticleSystem>().Stop();
+                m_SwordVFX_Glow.SetActive(false);
+
+                if(!m_SwordVFX_GlowEnrage.activeSelf) {
+                    m_SwordVFX_GlowEnrage.SetActive(true);
+                    m_SwordVFX_GlowEnrage.GetComponent<ParticleSystem>().Play();
+                }
             }
         } else {
             m_SwordVFX_Glow.GetComponent<ParticleSystem>().Stop();

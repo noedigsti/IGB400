@@ -17,9 +17,13 @@ public class UIMenuBehaviour : MonoBehaviour
     public GameObject tapArea;
     public GameObject buttonMoveLeft;
     public GameObject buttonMoveRight;
+    public TMPro.TMP_Text score;
 
     public Button pauseButton;
     public GameObject PauseCanvas;
+    bool Playable = true;
+    float delayAfterPausing;
+
     public PlayerController playerController;
     public Slider levelProgress;
     public Slider playerHPBar;
@@ -36,6 +40,7 @@ public class UIMenuBehaviour : MonoBehaviour
                 UpdateEventSystemUIInputModule();
                 break;
             case false:
+                StartCoroutine(EnableAfterPause());
                 break;
         }
         UpdateCoreObjects(_state);
@@ -47,6 +52,7 @@ public class UIMenuBehaviour : MonoBehaviour
     }
     private void OnEnable() {
         pauseButton.onClick.AddListener(() => PauseOption());
+        delayAfterPausing = 0.55f;
     }
     private void OnDisable() {
         pauseButton.onClick.RemoveAllListeners();
@@ -59,7 +65,17 @@ public class UIMenuBehaviour : MonoBehaviour
     public void PauseGame(bool _b) {
         GameManager.Instance.TogglePause(_b);
         CameraManager.Instance.PauseGame(_b);
+        if(_b) {
+            Playable = !GameManager.Instance.IsPaused;
+        }
     }
+    public void RestartLevel() {
+        UIManager.Instance.transform.parent.GetComponentInChildren<GameSceneManager>().RestartScene();
+    }
+    public void ReturnMainMenu() {
+        UIManager.Instance.transform.parent.GetComponentInChildren<GameSceneManager>().LoadMainMenuScene();
+    }
+
 
     public void PlayerJump() {
         playerController.OnCharacterJump();
@@ -114,6 +130,7 @@ public class UIMenuBehaviour : MonoBehaviour
     }
     void UpdateGameplayUIs() {
         playerHPBar.value = playerController.GetPlayerCurrentHP;
+        score.text = playerController.GetPlayerScore.ToString();
 
         float p = WorldLevelManager
             .Instance
@@ -123,24 +140,25 @@ public class UIMenuBehaviour : MonoBehaviour
     private void LateUpdate() {
         UpdateGameplayUIs();
     }
+    IEnumerator EnableAfterPause() {
+        yield return new WaitForSeconds(delayAfterPausing);
+        Playable = true;
+    }
     private void Update() {
-        if (Touch.activeFingers.Count > 0) {
+        if (Touch.activeFingers.Count > 0 && Playable) {
 
             // Going through the active touches on the screen
             foreach(var touch in Touch.activeTouches) {
                 //Debug.Log("Finger Index = " + touch.finger.index);
                 //Debug.Log("Touch Index = " + touch.touchId);
 
-
                 GameObject target = IsPointerOverUIObject(uiCanvas,touch.startScreenPosition,"GameUI");
                 if (target != null) {
-                    //Debug.Log(target.name);
                     switch(target.name) {
                         case "Jump":
                             PlayerJump(); 
                             break;
                         case "Attack":
-                            //playerController.OnAttack();
                             break;
                         case "Defending":
                             break;
@@ -183,7 +201,6 @@ public class UIMenuBehaviour : MonoBehaviour
         if(results.Count > 0) {
             foreach(var go in results) {
                 if(go.gameObject.transform.CompareTag(_tag)) {
-                    // Do something if such gameobject identified
                     return go.gameObject;
                 }
             }
@@ -191,7 +208,7 @@ public class UIMenuBehaviour : MonoBehaviour
         return null;
     }
     public void test(float _damage) {
-        playerController.OnTakeDamage(_damage);
+        playerController.TakeDamage(_damage);
     }
     public void test2(float _damage) {
         playerController.OnRevive();

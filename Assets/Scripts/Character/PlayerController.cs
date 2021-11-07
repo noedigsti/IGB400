@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] bool CanJump = false;
     [SerializeField] bool IsGrounded = false;
     [SerializeField] int KilledOnce = 0;
+    [SerializeField] float KilledOnceTimer = 5f;
     public CharacterState CurrentCharacterState {
         get {
             if(IsAttacking) return CharacterState.IsAttacking;
@@ -332,7 +333,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator ToggleSwordGlow() {
         KilledOnce++;
         attackPower = attackPowerCap;
-        yield return new WaitForSeconds(3f); // Timer
+        yield return new WaitForSeconds(KilledOnceTimer); // Timer
         KilledOnce = 0;
         attackPower = attackPowerDefault;
     }

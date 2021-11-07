@@ -215,7 +215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
-  delay: 2.5
+  delay: 2.7
 --- !u!1 &4100176159810695904
 GameObject:
   m_ObjectHideFlags: 0

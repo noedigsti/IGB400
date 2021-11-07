@@ -96,7 +96,7 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(!isTakingHit && !isDead) {
+        if(!isTakingHit && !isDead && !GameManager.Instance.IsPaused) {
             if (patrolWaypoints.Count >= 1) {
                 MoveCharacter();
                 TurnCharacter();

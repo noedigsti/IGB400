@@ -752,6 +752,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1990477050, guid: a2a4d7780d97d9943af0d02720dc0977, type: 3}
+      propertyPath: delay
+      value: 2.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3939067416002774396, guid: a2a4d7780d97d9943af0d02720dc0977,
         type: 3}
       propertyPath: m_AnchoredPosition.x

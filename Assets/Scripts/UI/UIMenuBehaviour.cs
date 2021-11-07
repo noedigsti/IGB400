@@ -62,7 +62,9 @@ public class UIMenuBehaviour : MonoBehaviour
     public void PauseOption() {
 
     }
+
     public void PauseGame(bool _b) {
+        FindObjectOfType<AudioManager>().Play("PauseClick");
         GameManager.Instance.TogglePause(_b);
         CameraManager.Instance.PauseGame(_b);
         if(_b) {
@@ -73,17 +75,21 @@ public class UIMenuBehaviour : MonoBehaviour
         UIManager.Instance.transform.parent.GetComponentInChildren<GameSceneManager>().RestartScene();
     }
     public void ReturnMainMenu() {
+        FindObjectOfType<AudioManager>().Play("PauseClick");
         UIManager.Instance.transform.parent.GetComponentInChildren<GameSceneManager>().LoadMainMenuScene();
     }
 
 
     public void PlayerJump() {
+        FindObjectOfType<AudioManager>().Play("Jump");
         playerController.OnCharacterJump();
     }
     public void PlayerAttack() {
+        FindObjectOfType<AudioManager>().Play("PlayerSweep");
         playerController.OnAttack();
     }
     public void PlayerDefend() {
+        FindObjectOfType<AudioManager>().Play("PlayerShield");
         playerController.OnDefend();
     }
     public void PlayerNotDefend() {
@@ -100,12 +106,14 @@ public class UIMenuBehaviour : MonoBehaviour
     bool MoveCharacterLeft = false;
     bool MoveCharacterRight = false;
     public void PlayerMoveLeft() {
+        FindObjectOfType<AudioManager>().Play("PlayerMove");
         if(counterL++ >= 1) {
             RunCharacter = true;
         }
         MoveCharacterLeft = true;
     }
     public void PlayerMoveRight() {
+        FindObjectOfType<AudioManager>().Play("PlayerMove");
         if(counterR++ >= 1) {
             RunCharacter = true;
         }

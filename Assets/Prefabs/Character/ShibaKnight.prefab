@@ -16311,6 +16311,7 @@ MonoBehaviour:
   DrawDebugGizmos: 1
   groundCheckColliderRadius: 0.1
   groundCheckColliderOffset: -0.05
+  score: 0
   health: 100
   healthDecimal: 100
   maxHealth: 100
@@ -16329,6 +16330,7 @@ MonoBehaviour:
   CanJump: 0
   IsGrounded: 0
   KilledOnce: 0
+  KilledOnceTimer: 5
   attackHitbox: {fileID: 4654001391572737795}
   m_BarrierShield: {fileID: 4654001393397186906}
   BarrierShieldEnabled: 0
@@ -16480,7 +16482,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.32
+  m_Radius: 0.38
   m_Height: 1.3928025
   m_Direction: 1
   m_Center: {x: 0, y: 0.691422, z: 0}

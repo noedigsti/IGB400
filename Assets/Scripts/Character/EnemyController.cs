@@ -77,10 +77,12 @@ public class EnemyController : MonoBehaviour
             healthDecimal -= _damage;
             health = Mathf.RoundToInt(healthDecimal);
             ui.DisplayDamageTaken(_damage);
+            FindObjectOfType<AudioManager>().Play("EnemyHit");
         }
         if(health <= 0) {
             isDead = true;
             StartCoroutine(DieSequence());
+            FindObjectOfType<AudioManager>().Play("EnemyDeath");
         }
     }
     IEnumerator DieSequence() {

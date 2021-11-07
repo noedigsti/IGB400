@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &306056118341863477
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 306056118341863482}
+  - component: {fileID: 306056118341863480}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &306056118341863482
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306056118341863477}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &306056118341863480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 306056118341863477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bc1629952d2ffa4b925ff8bab6ea320, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: MainMenuStart
+    clip: {fileID: 8300000, guid: 897f92198b6f7b449b42a42f10f8d9fe, type: 3}
+    volume: 0.841
+    volumeVariance: 0.359
+    pitch: 1
+    pitchVariance: 0
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: Jump
+    clip: {fileID: 8300000, guid: c9be3442f2b11e64d9d107c367afca79, type: 3}
+    volume: 0.817
+    volumeVariance: 0.163
+    pitch: 0.83
+    pitchVariance: 0
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: EnemyHit
+    clip: {fileID: 8300000, guid: 99ded11c089c85f40ac052dd1d5e980c, type: 3}
+    volume: 0.793
+    volumeVariance: 0.367
+    pitch: 2.13
+    pitchVariance: 0
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: EnemyDeath
+    clip: {fileID: 8300000, guid: 4a7ac013d9ebf2344940ad73976187b8, type: 3}
+    volume: 0.862
+    volumeVariance: 0.307
+    pitch: 0.5
+    pitchVariance: 0.347
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: PlayerHit
+    clip: {fileID: 8300000, guid: 60b96dcd0411fc1479a99517f93e7d80, type: 3}
+    volume: 0.864
+    volumeVariance: 0.076
+    pitch: 0.48
+    pitchVariance: 0
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: PauseClick
+    clip: {fileID: 8300000, guid: cd579c2df81cf1044a457ef3a09303b5, type: 3}
+    volume: 0.5
+    volumeVariance: 0.307
+    pitch: 0.5
+    pitchVariance: 0.347
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: PlayerSweep
+    clip: {fileID: 8300000, guid: b9d55cda63d2e90499dd87244511193b, type: 3}
+    volume: 0.862
+    volumeVariance: 0.307
+    pitch: 0.56
+    pitchVariance: 0.167
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: PlayerShield
+    clip: {fileID: 8300000, guid: a48084d81ac484146a3e0df285fd4f86, type: 3}
+    volume: 0.676
+    volumeVariance: 0.096
+    pitch: 0.66
+    pitchVariance: 0.096
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}
+  - name: PlayerMove
+    clip: {fileID: 8300000, guid: 3aab0cbb336b6484bbff50d5e5e0fc9e, type: 3}
+    volume: 0.712
+    volumeVariance: 0.065
+    pitch: 0.63
+    pitchVariance: 0.146
+    loop: 0
+    mixerGroup: {fileID: 0}
+    source: {fileID: 0}

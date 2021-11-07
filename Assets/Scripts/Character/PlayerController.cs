@@ -317,6 +317,7 @@ public class PlayerController : MonoBehaviour
             health = Mathf.RoundToInt(healthDecimal);
             CharacterStop();
             animator.Play("GetHit");
+            FindObjectOfType<AudioManager>().Play("PlayerHit");
         }
     }
     public void AttackTarget(GameObject _obj) {

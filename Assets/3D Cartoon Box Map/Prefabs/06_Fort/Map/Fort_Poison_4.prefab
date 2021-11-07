@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 449294}
   - component: {fileID: 3363426}
   - component: {fileID: 2353328}
+  - component: {fileID: 6545165177292228624}
   m_Layer: 0
   m_Name: Fort_Poison_4
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &6545165177292228624
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102030}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000017, y: 0.80000097, z: 1.000001}
+  m_Center: {x: -0.000000059604645, y: -0.39999995, z: -0.00000011920929}

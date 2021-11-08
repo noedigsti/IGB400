@@ -91,10 +91,10 @@ MonoBehaviour:
     source: {fileID: 0}
   - name: PauseClick
     clip: {fileID: 8300000, guid: cd579c2df81cf1044a457ef3a09303b5, type: 3}
-    volume: 0.5
+    volume: 0.57
     volumeVariance: 0.307
     pitch: 0.5
-    pitchVariance: 0.347
+    pitchVariance: 0.19
     loop: 0
     mixerGroup: {fileID: 0}
     source: {fileID: 0}

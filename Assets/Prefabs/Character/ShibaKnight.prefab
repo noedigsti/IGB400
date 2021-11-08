@@ -93,6 +93,59 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &2433524937539584661
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 211089956589506160}
+  - component: {fileID: 8868541398765520951}
+  - component: {fileID: 5209197798665787067}
+  m_Layer: 11
+  m_Name: Presence
+  m_TagString: PlayerPresence
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &211089956589506160
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2433524937539584661}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4654001392986323767}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8868541398765520951
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2433524937539584661}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!135 &5209197798665787067
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2433524937539584661}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 40
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2948361498786037069
 GameObject:
   m_ObjectHideFlags: 0
@@ -15040,6 +15093,7 @@ Transform:
   m_Children:
   - {fileID: 4654001393397186909}
   - {fileID: 4654001391572737792}
+  - {fileID: 211089956589506160}
   m_Father: {fileID: 6645416162937122671}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -16317,7 +16371,7 @@ MonoBehaviour:
   maxHealth: 100
   attackPower: 10
   attackPowerDefault: 10
-  attackPowerCap: 20
+  attackPowerCap: 25
   IsDead: 0
   DeathCheck: 1
   shieldCount: 1
@@ -16330,7 +16384,7 @@ MonoBehaviour:
   CanJump: 0
   IsGrounded: 0
   KilledOnce: 0
-  KilledOnceTimer: 5
+  KilledOnceTimer: 12
   attackHitbox: {fileID: 4654001391572737795}
   m_BarrierShield: {fileID: 4654001393397186906}
   BarrierShieldEnabled: 0

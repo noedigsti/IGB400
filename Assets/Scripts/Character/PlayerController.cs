@@ -210,7 +210,7 @@ public class PlayerController : MonoBehaviour
     public void OnDefend() {
         CharacterStop();
         if (shieldCount > 0) {
-            //shieldCount--; // Available shields
+            //shieldCount--; // # of Available shields left
             animator.SetBool(playerDefendAnimationPID, true);
         }
     }
@@ -558,5 +558,9 @@ public class PlayerController : MonoBehaviour
     
     public Vector3 GetCurrentCharacterPosition() {
         return transform.position;
+    }
+    public void OnTriggerEnter(Collider other) {
+        
+
     }
 }

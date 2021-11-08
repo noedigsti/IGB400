@@ -3,7 +3,16 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Spawn Point
+  - Floor
+  - Hitbox
+  - Destination
+  - GameUI
+  - Enemy
+  - Death
+  - SpawnEnemy
+  - PlayerPresence
   layers:
   - Default
   - TransparentFX
@@ -11,12 +20,12 @@ TagManager:
   - 
   - Water
   - UI
+  - Ground
   - 
   - 
   - 
-  - 
-  - 
-  - 
+  - PauseUI
+  - Presence
   - 
   - 
   - 

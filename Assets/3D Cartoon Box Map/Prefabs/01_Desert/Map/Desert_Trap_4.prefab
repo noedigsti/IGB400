@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 424270}
   - component: {fileID: 3368234}
   - component: {fileID: 2367232}
+  - component: {fileID: 5592041144382902019}
   m_Layer: 0
   m_Name: Desert_Trap_4
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &5592041144382902019
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 149850}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000011, y: 0.8000014, z: 1.0000018}
+  m_Center: {x: -0.0000007301569, y: -0.39999938, z: -0.0000014901161}

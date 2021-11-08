@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 424714}
   - component: {fileID: 3364924}
   - component: {fileID: 2348452}
+  - component: {fileID: 693160259485123094}
   m_Layer: 0
   m_Name: Cave01_4
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -59,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 49cd18b05e6198b4abb38e3b76d46538, type: 2}
+  - {fileID: 2100000, guid: 86cc6b609c634403c9eea7907b9edbd7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &693160259485123094
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 147966}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000017, y: 0.8, z: 1.0000018}
+  m_Center: {x: -0.000001758337, y: -0.39999995, z: -0.0000004172325}

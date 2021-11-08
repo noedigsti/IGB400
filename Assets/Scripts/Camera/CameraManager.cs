@@ -3,48 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : Singleton<CameraManager>
 {
     [Header("Component References")]
     public Camera GameCam;
     public Camera UICam;
-    [Header("Component References")]
-    CinemachineComponentBase componentBase;
-    public GameObject VCamOrbit;
+    [Header("Pause References")]
+    public GameObject UIPauseCam;
+    public GameObject UIPause;
+    [Header("_")]
     public GameObject LookAtObject;
-
-    public UIScript uiScript;
-    Vector3 GetCenter(GameObject o) {
-        Vector3 sumVector = new Vector3(0f,0f,0f);
-        var children = GetComponentsInChildren<Transform>();
-        //Bounds bounds = children[0].bounds;
-        foreach(Transform child in o.transform) {
-            //Debug.Log(child.position);
-            sumVector += child.position;
-            //bounds.Encapsulate(child.bounds);
-        }
-
-        Vector3 groupCenter = sumVector/o.transform.childCount;
-        return groupCenter;
-    }
+    public CameraController cameraController;
     private void Start() {
-        Debug.Log(LookAtObject.transform.childCount);
-        //var c = LookAtObject.GetComponentsInChildren<Transform>();
-        //foreach(var child in c) {
-        //    Debug.Log(child.position);
-        //}
-        Vector3 position = GetCenter(LookAtObject);
-        //Debug.Log(position);
-        GameObject wCenter = new GameObject();
-        wCenter.transform.position = position;
-        VCamOrbit.GetComponent<CinemachineFreeLook>().m_Follow = wCenter.transform;
-        VCamOrbit.GetComponent<CinemachineFreeLook>().m_LookAt = wCenter.transform;
+        LookAtObject = GameManager.Instance.playerPrefab;
+        ResetActiveCameraTarget();
     }
-
-    public void Swap() {
-        uiScript.DebugLog();
-        Time.timeScale = 0f;
-        //GameCam.gameObject.SetActive(!GameCam.gameObject.activeSelf);
-        UICam.gameObject.SetActive(!UICam.gameObject.activeSelf);
+    public void ResetActiveCameraTarget() {
+        cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.LookAt = LookAtObject.transform;
+        cameraController.GetComponent<CinemachineStateDrivenCamera>().LiveChild.Follow = LookAtObject.transform;
+    }
+    public void PauseGame(bool _b) {
+        UIPause.SetActive(_b);
+        UIPauseCam.SetActive(_b);
+    }
+    public void RotateCameraLeft() {
+        cameraController.SwitchCamera(-1);
+    }
+    public void RotateCameraRight() {
+        cameraController.SwitchCamera(1);
     }
 }

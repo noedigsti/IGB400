@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 407302}
   - component: {fileID: 3317160}
   - component: {fileID: 2396242}
+  - component: {fileID: 8355773701050845989}
   m_Layer: 0
   m_Name: Lava_Trap_4
-  m_TagString: Untagged
+  m_TagString: Floor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8355773701050845989
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 157578}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.0000037, y: 0.80000085, z: 1.0000033}
+  m_Center: {x: 0.0000012516975, y: -0.39999965, z: 0.00000044703484}
